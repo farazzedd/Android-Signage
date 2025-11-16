@@ -1,0 +1,258 @@
+I want to build a complete, ready-to-deploy digital signage system similar to Xibo, but only for Android Smart TVs, with my own open backend, CMS, and Android player web app (plus a lightweight APK version).
+
+When the APK is installed on a TV, it must ask for an invite code. That invite code will link the player to the client’s CMS account, where they can manage content, playlists, and displays.
+
+Your job:
+Design the architecture and then give me all code, Docker files, setup scripts, and step-by-step commands required to:
+
+Run everything on a single server (no S3, no external managed database services).
+
+Push the repo to GitHub.
+
+Do a fast first deployment using Vercel (for whatever parts Vercel is suitable for, e.g., the CMS frontend or a backend if possible), and suggest the fastest realistic way to deploy the remaining services (for example a single VPS with Docker for backend + player APIs).
+
+Make this look and feel like a professional, enterprise-grade product.
+
+⚙️ Functional Requirements
+CMS Backend
+
+Auth & Users
+
+Admin login.
+
+Client login.
+
+Each client should only see their own displays, media, playlists, and schedules.
+
+Support user groups / roles per client (e.g., up to 5 users per client account) with access limited to their company’s resources.
+
+Displays
+
+Each display (Android TV with APK installed) shows an invite code screen on first launch.
+
+The client can generate invite codes from the CMS.
+
+When the invite code is entered in the app, that display is linked to the client account and appears in their Displays list.
+
+Media
+
+Upload images and videos from the CMS.
+
+Important: store all media on the server itself, for example:
+
+Local filesystem with organized folders per client
+
+Mounted Docker volume for persistence
+
+No S3 or external object storage. Everything must live on the same server stack.
+
+Playlists
+
+Create playlists and add media items (images/videos).
+
+Control ordering and duration (for images).
+
+Layouts
+
+No complex layouts like Xibo.
+
+Just full-screen images/videos.
+
+Allow configuration based on resolution (e.g., 1080p, 4K).
+
+Schedules
+
+Assign playlists to displays on a schedule (e.g., specific times, date ranges, always-on).
+
+WebSockets
+
+Implement a WebSocket channel to push /display/:key/refresh (or similar) events to active players so they can instantly refresh their content.
+
+Also support periodic polling (e.g., every 5 minutes) as a fallback.
+
+Storage / DB constraint
+
+Do not rely on external managed databases or cloud storage.
+
+Use the simplest possible persistence fully running on the server, such as:
+
+SQLite
+
+Or another embedded / self-hosted DB inside Docker
+
+Clearly document how to initialize and migrate the database in the Dockerized setup.
+
+🖥️ CMS Frontend (Dockerized)
+
+Build a modern, responsive, professional web frontend for the CMS. It should be Dockerized.
+
+Pages
+
+Login (email/password)
+
+Up to 5 users per client account.
+
+Displays
+
+List displays for the logged-in client.
+
+Create / link displays (generate invite codes).
+
+Show online/offline status, last check-in, assigned playlist.
+
+Media
+
+Upload and list images/videos.
+
+All media must be stored on the same server’s filesystem (via backend API).
+
+Playlists
+
+Create playlists and add/remove media.
+
+Reorder media.
+
+Schedules
+
+Assign playlists to displays with schedules.
+
+The frontend should:
+
+Connect to the backend via REST + WebSocket.
+
+Be cleanly designed and professional (enterprise-grade UI/UX).
+
+Be easy to deploy on Vercel. Provide:
+
+package.json
+
+Any required vercel.json config
+
+Documentation on environment variables for connecting to the backend.
+
+📺 Android Player (APK + Web App)
+
+Create an Android TV player that can run as:
+
+A full-screen webapp (if feasible).
+
+A lightweight native APK that:
+
+On first launch:
+
+Shows an “Enter invite code” screen.
+
+Sends the invite code to the backend to register the display.
+
+After linking:
+
+Establishes a WebSocket connection to receive refresh events.
+
+Fetches the assigned playlist and media.
+
+Downloads and caches media locally on the device.
+
+Plays the media in a loop (images + videos).
+
+Periodically (e.g., every 5 minutes) checks with the backend for updates.
+
+Should run in full screen, with no UI chrome.
+
+Use any reliable open-source library for:
+
+Video playback
+
+Image display
+But every logo/name used in the UI must be updated to our brand: “Elvision”.
+
+The player must be robust and feel like an enterprise-grade signage app:
+
+Auto-restart playback if there’s an error.
+
+Handle offline mode using cached content.
+
+Retry connections to backend/WebSocket.
+
+🏗️ Architecture & Deployment Requirements
+
+Design a monorepo structure that I can push to GitHub:
+
+backend/
+
+frontend/
+
+android-player/
+
+docker/ or root-level Docker files
+
+Any infra/config files (e.g., docker-compose.yml, vercel.json)
+
+Dockerization
+
+Provide complete Dockerfiles for:
+
+Backend
+
+Frontend (if also self-hosted)
+
+Provide a docker-compose.yml that:
+
+Runs the backend, DB (if needed), and any other services on a single server.
+
+Mounts volumes for:
+
+Media files
+
+Database persistence
+
+Fast Deployment
+
+Assume I will:
+
+Push everything to GitHub.
+
+Deploy the CMS frontend first on Vercel.
+
+Deploy the backend and any DB/file storage on a single server (for example, a cheap VPS) using Docker / docker-compose.
+
+I need:
+
+Clear instructions for connecting the Vercel-deployed frontend to the backend running on another host.
+
+Environment variables and sample .env files for local and production.
+
+Any reverse proxy config if needed (e.g., Nginx) to serve media, handle WebSockets, etc.
+
+🔐 Security & Branding
+
+The backend must use secure authentication (e.g., JWT or session-based) and basic security best practices.
+
+No hardcoded secrets; use environment variables.
+
+Any open-source project or template you reuse must:
+
+Remove its original branding/name in the UI.
+
+Replace visible names/logos with “Elvision”.
+
+📦 What I Expect You To Output
+
+Full codebase (or as close as possible), including:
+
+Backend (API, WebSocket, models, auth, media handling)
+
+Frontend (React/Next.js or similar, with professional UI)
+
+Android player (native +/or web-based)
+
+All Dockerfiles and a docker-compose.yml.
+
+Setup & deployment scripts (e.g., shell scripts for initializing the server).
+
+Step-by-step instructions for:
+
+Running locally in development.
+
+Running everything on a single VPS with Docker.
+
+Deploying frontend to Vercel and wiring it to the backend.
