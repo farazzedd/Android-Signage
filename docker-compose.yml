@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: elvision-backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - DATABASE_URL=${DATABASE_URL:-sqlite:./db.sqlite}
+      - JWT_SECRET=${JWT_SECRET}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - UPLOADS_DIR=/app/uploads
+      - DOMAIN=${DOMAIN:-localhost}
+    volumes:
+      - ./uploads:/app/uploads
+      - ./db.sqlite:/app/db.sqlite
+    networks:
+      - elvision-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+networks:
+  elvision-network:
+    driver: bridge
+
+volumes:
+  uploads:
+  db:

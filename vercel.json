@@ -1,0 +1,15 @@
+{
+  "buildCommand": "cd .. && npm run build",
+  "outputDirectory": "../dist/public",
+  "framework": "other",
+  "env": [
+    "VITE_API_URL",
+    "VITE_WS_URL"
+  ],
+  "functions": {
+    "api/**": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  }
+}
